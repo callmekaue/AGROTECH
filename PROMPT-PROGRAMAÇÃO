@@ -1,0 +1,203 @@
+**PERSONA:** Robô assistente agrícola inteligente, atuando como um ajudante de campo para agricultores familiares, com comunicação simples, direta e acessível, voltada para usuários com baixo nível de escolaridade ou não alfabetizados.
+--
+**TAREFA:** Desenvolver um sistema simples, intuitivo e fácil de usar, capaz de auxiliar o produtor rural no dia a dia, garantindo que mesmo usuários com baixa escolaridade ou sem alfabetização consigam utilizar o robô sem dificuldades, por meio de interações claras, diretas e de fácil compreensão.
+--
+**CONTEXTO:** O sistema será utilizado por pequenos produtores rurais do interior, que possuem pouca ou nenhuma familiaridade com tecnologia. Muitos desses usuários enfrentam dificuldades na leitura e interpretação de informações, o que exige uma solução acessível, prática e funcional.
+Diante disso, a programação do robô deve priorizar simplicidade, com menus objetivos, comandos diretos, respostas curtas e, sempre que possível, integração com áudio ou sinais visuais. O sistema também deve ser capaz de coletar dados de sensores (como umidade, temperatura e luminosidade), analisar essas informações e gerar recomendações automáticas sobre irrigação, plantio e manejo, além de auxiliar na organização de tarefas agrícolas e planejamento da produção e vendas.
+--
+**FORMATO:**
+-Código em Python 3; 
+-Uso de bibliotecas simples (como datetime, json, time); 
+-Estrutura organizada em funções (leitura de sensores, análise, decisão, tarefas); 
+-Sistema baseado em menu simples no console; 
+-Integração com Arduino via comunicação serial (quando aplicável); 
+-Armazenamento de dados em arquivos JSON; 
+-Simulação de sensores quando não houver hardware disponível; 
+-Tratamento de erros (entrada inválida, falha de leitura, arquivo inexistente); 
+-Respostas do sistema curtas, claras e diretas;
+--
+**RESTRIÇÕES:**
+**PROTEÇÃO DE DADOS(LGPD):**
+ -Não armazenar dados pessoais sem necessidade
+-Não compartilhar informações do usuário
+-Garantir uso seguro dos dados coletados
+**SEGURANÇA OPERACIONAL:**
+-Não ativar irrigação automaticamente sem recomendação clara
+-Evitar ações que possam prejudicar a plantação
+**LIMITAÇÕES DO SISTEMA:**
+-Considerar possibilidade de erro nos sensores
+-Informar quando dados estiverem ausentes ou inválido
+-Não tomar decisões críticas sem confirmação
+**USO RESPONSÁVEL:**
+-Priorizar economia de água e energia
+-Priorizar saúde da plantação
+-Evitar desperdícios
+--
+import json
+import time
+from datetime import datetime, date, timedelta
+import random  # apenas para simular sensores
+--
+###CONFIGURAÇÕES - arquivo onde os dados são guardados
+--
+ARQUIVO_DADOS = "dados_agricola.json"
+--
+###FUNÇÕES DE ARQUIVO (salvar e carregar dados)
+--
+def carregar_dados():
+    """Carrega os dados salvos no arquivo JSON."""
+    try:
+        with open(ARQUIVO_DADOS, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {
+            "tarefas": [],
+            "historico_sensores": [],
+            "historico_irrigacao": []
+        }
+    except json.JSONDecodeError:
+        print("Arquivo de dados com problema. Começando novo arquivo.")
+        return {
+            "tarefas": [],
+            "historico_sensores": [],
+            "historico_irrigacao": []
+        }
+def salvar_dados(dados):
+    """Salva os dados no arquivo JSON."""
+    try:
+        with open(ARQUIVO_DADOS, "w", encoding="utf-8") as f:
+            json.dump(dados, f, ensure_ascii=False, indent=2)
+        print("Dados salvos com sucesso!")
+    except Exception as e:
+        print(f"Não consegui salvar os dados: {e}")
+--
+###LEITURA DE SENSORES (simulado)
+--
+def ler_sensores_simulado():
+    return {
+        "temperatura": round(random.uniform(18, 40), 1),
+        "umidade_solo": round(random.uniform(10, 90), 1),
+        "umidade_ar": round(random.uniform(20, 80), 1),
+        "luminosidade": round(random.uniform(100, 1000), 0),
+        "horario": datetime.now().strftime("%d/%m/%Y %H:%M")
+    }
+def ler_sensores_manual():
+    print("\nDigite os valores dos sensores:")
+    try:
+        temperatura = float(input("Temperatura (°C): "))
+        umidade_solo = float(input("Umidade do solo (%): "))
+        umidade_ar = float(input("Umidade do ar (%): "))
+        luminosidade = float(input("Luminosidade (lux): "))
+        return {
+            "temperatura": temperatura,
+            "umidade_solo": umidade_solo,
+            "umidade_ar": umidade_ar,
+            "luminosidade": luminosidade,
+            "horario": datetime.now().strftime("%d/%m/%Y %H:%M")
+        }
+    except ValueError:
+        print("Valor inválido. Usando dados simulados.")
+        return ler_sensores_simulado()
+--
+###ANÁLISE DO SOLO E CLIMA
+--
+def analisar_solo(umidade_solo):
+    if umidade_solo < 30:
+        return "SECO", "RISCO"
+    elif umidade_solo <= 70:
+        return "IDEAL", "BOM"
+    else:
+        return "ENCHARCADO", "RISCO"
+def analisar_clima(temperatura):
+    if temperatura > 35:
+        return "MUITO QUENTE", "CRITICO"
+    elif temperatura < 10:
+        return "MUITO FRIO", "FRIO EXTREMO"
+    elif temperatura <= 15:
+        return "FRESCO", "ATENCAO"
+    else:
+        return "AGRADAVEL", "BOM"
+def gerar_recomendacao(sensores):
+    temperatura = sensores["temperatura"]
+    umidade_solo = sensores["umidade_solo"]
+    estado_solo, _ = analisar_solo(umidade_solo)
+    if estado_solo == "SECO" and temperatura > 30:
+        return (
+            "O solo está seco e o calor está forte.\n"
+            "Ligue a água agora por pelo menos 20 minutos.\n"
+            "Risco de perda da plantação."
+        ), "IRRIGAR_IMEDIATO"
+    elif estado_solo == "SECO":
+        return (
+            "O solo está seco.\n"
+            "Molhe as plantas em breve, por cerca de 15 minutos."
+        ), "IRRIGAR_BREVE"
+    elif estado_solo == "ENCHARCADO":
+        return (
+            "O solo está com muita água.\n"
+            "Não irrigar agora."
+        ), "NAO_IRRIGAR"
+    else:
+        return (
+            "Tudo está em condição normal.\n"
+            "Apenas continue monitorando."
+        ), "OK"
+--
+###RELATÓRIO
+--
+def exibir_relatorio(sensores):
+    estado_solo, _ = analisar_solo(sensores["umidade_solo"])
+    estado_clima, _ = analisar_clima(sensores["temperatura"])
+    recomendacao, acao = gerar_recomendacao(sensores)
+    print("\n" + "=" * 50)
+    print("RELATÓRIO DO CAMPO")
+    print("=" * 50)
+    print(f"Horário: {sensores['horario']}")
+    print(f"Temperatura: {sensores['temperatura']}°C - {estado_clima}")
+    print(f"Umidade do solo: {sensores['umidade_solo']}% - {estado_solo}")
+    print(f"Umidade do ar: {sensores['umidade_ar']}%")
+    print(f"Luminosidade: {sensores['luminosidade']} lux")
+    print("-" * 50)
+    print("RECOMENDAÇÃO:")
+    print(recomendacao)
+    print("=" * 50)
+    return acao
+--
+###MENU PRINCIPAL
+--
+def menu_principal():
+    print("\n" + "=" * 50)
+    print("ROBO AGRICOLA - MENU")
+    print("=" * 50)
+    print("[1] Ver situação do campo")
+    print("[2] Inserir dados manualmente")
+    print("[0] Sair")
+    print("-" * 50)
+    return input("Escolha: ").strip()
+--
+###LOOP PRINCIPAL
+def iniciar_sistema():
+    print("\nSistema iniciado")
+    dados = carregar_dados()
+    while True:
+        opcao = menu_principal()
+        if opcao == "1":
+            sensores = ler_sensores_simulado()
+            dados["historico_sensores"].append(sensores)
+            salvar_dados(dados)
+            exibir_relatorio(sensores)
+        elif opcao == "2":
+            sensores = ler_sensores_manual()
+            dados["historico_sensores"].append(sensores)
+            salvar_dados(dados)
+            exibir_relatorio(sensores)
+        elif opcao == "0":
+            print("Encerrando sistema.")
+            break
+else:
+            print("Opção inválida.")
+        time.sleep(1)
+###PONTO DE ENTRADA
+==
+if __name__ == "__main__":
+    iniciar_sistema()
