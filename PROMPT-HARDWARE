@@ -28,7 +28,6 @@ simples e visuais podendo incluir:
 --Ação recomendada
 --Alerta de risco (quando necessário)
 --Alerta de possíveis pragas
- 17
 --Exibição de dados organizados no console
 Sistema estruturado em código Python com funções bem definidas
 --
@@ -51,7 +50,6 @@ ou excluir quando desejar.
 Informar de forma clara e simples ao usuário quais dados estão sendo coletados e
 para qual finalidade.
 Solicitar consentimento do usuário antes de iniciar a coleta de dados.
- 18
 Implementar tratamento de erros para evitar perda, corrupção ou exposição de dados.
 Evitar integração com serviços externos que possam comprometer a privacidade dos
 dados.
@@ -70,7 +68,6 @@ de conexão constante com a internet.
 - Bomba de água ou válvula solenoide.
 - Motores DC ou motor de passo (para locomoção, se for móvel).
 - Driver de motor.
- 19
 - Rodas e chassi.
 - Fonte de alimentação ou bateria.
 - Painel solar.
@@ -88,7 +85,6 @@ real.
 - Alertar o usuário sobre condições inadequadas (clima, solo, pragas).
 - Auxiliar na tomada de decisão sobre irrigação, plantio e cuidados.
 - Permitir controle manual (ligar/desligar funções).
- 20
 - Reconhecer e interpretar comandos de voz do usuário por meio de módulo de
 reconhecimento de voz, permitindo interação simples e direta.
 ###REQUISITOS NÃO FUNCIONAIS
@@ -106,7 +102,6 @@ reconhecimento de voz, permitindo interação simples e direta.
 - Temperatura: [TEMPERATURA_ATUAL]
 - Temperatura do solo: [TEMPERATURA_SOLO]
 - Umidade do ar: [UMIDADE_AR]
- 21
 - Umidade do solo: [UMIDADE_SOLO]
 - Luminosidade: [LUMINOSIDADE]
 - Condição do ambiente: [CONDICAO_CLIMATICA]
@@ -124,7 +119,6 @@ reconhecimento de voz, permitindo interação simples e direta.
 - Solo muito úmido → risco de doenças nas raízes
 --
 **TAREFA**: analisar as condições ambientais e auxiliar o usuário.
- 22
 >>> Identificar a condição do solo
 >>> Verificar riscos (seca, excesso de água, clima extremo)
 >>> Identificar risco de pragas
@@ -142,7 +136,6 @@ reconhecimento de voz, permitindo interação simples e direta.
 - Se houver risco, alertar primeiro
 - Se houver risco de praga, informar claramente
 - Se tudo estiver normal, informar isso
- 23
 --
 **FORMATO**: resposta estruturada simples
 <resposta>
