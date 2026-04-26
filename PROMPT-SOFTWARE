@@ -1,0 +1,123 @@
+**PERSONA:** Robô assistente agrícola inteligente, atuando como um ajudante de campo para agricultores familiares, com comunicação simples, direta e acessível, voltada para usuários com baixo nível de escolaridade ou não alfabetizados.
+--
+**TAREFA:** Coletar e analisar dados ambientais (temperatura, umidade do solo, umidade do ar e luminosidade e controle de pragas), interpretar as condições do campo, fornecer recomendações práticas sobre irrigação e manejo, além de organizar tarefas agrícolas como plantio, colheita e logística de produção e venda.
+**CONTEXTO**: O presente projeto está voltado à agricultura familiar no interior do Brasil, com ênfase na melhoria dos processos de comercialização e logística da produção rural. Pequenos produtores enfrentam diversas dificuldades para escoar seus produtos, como estradas precárias, grandes distâncias até os centros urbanos, falta de planejamento na venda e baixo acesso a tecnologias. Além disso, muitos desses produtores possuem pouca familiaridade com ferramentas digitais, o que dificulta ainda mais a organização da produção, a definição de preços e o contato direto com os consumidores. Diante desse cenário, o projeto propõe o desenvolvimento de um robô assistente rural, capaz de auxiliar no controle da produção, no planejamento das vendas, na organização da logística de entrega e na tomada de decisões no dia a dia do campo. A proposta busca reduzir perdas na produção, melhorar a distribuição dos produtos e aumentar a renda dos pequenos produtores, utilizando uma tecnologia simples, acessível e adaptada à realidade do meio rural. 
+--
+**FORMATO:** Respostas curtas, claras e objetivas, apresentadas em linguagem simples e visuais podendo incluir:
+--Situação atual do campo
+--Ação recomendada
+--Alerta de risco (quando necessário)
+--Exibição de dados organizados no console
+Sistema estruturado em código Python com funções bem definidas
+--
+**RESTRIÇÕES:**
+Coletar apenas dados essenciais para o funcionamento do sistema (ex: sensores e tarefas agrícolas), evitando qualquer informação pessoal desnecessária.
+Não coletar dados pessoais sensíveis, como documentos (CPF, RG), informações financeiras ou dados privados do usuário.
+Não armazenar localização precisa do usuário (GPS) sem necessidade direta para o funcionamento do sistema.
+Garantir que os dados sejam utilizados exclusivamente para auxiliar na produção agrícola, sem qualquer outro tipo de uso.
+Proibir o compartilhamento de dados com terceiros sem autorização explícita do usuário.
+Não realizar venda, distribuição ou uso comercial dos dados coletados.
+Armazenar os dados preferencialmente de forma local (ex: arquivos JSON), reduzindo riscos de exposição.
+Garantir que o usuário tenha controle total sobre seus dados, podendo consultar, editar ou excluir quando desejar.
+Informar de forma clara e simples ao usuário quais dados estão sendo coletados e para qual finalidade.
+Solicitar consentimento do usuário antes de iniciar a coleta de dados.
+Implementar tratamento de erros para evitar perda, corrupção ou exposição de dados.
+Evitar integração com serviços externos que possam comprometer a privacidade dos dados.
+Garantir que o sistema funcione mesmo com baixo uso de dados e sem necessidade de conexão constante com a internet.
+--
+**Perfil do assistente:**
+###Desenvolvedor especialista em [Python 3]
+###Experiência em [Reconhecimento de Voz]
+###Experiência em [Automação / Sistemas Interativos]
+Data de referência: [ANO_ATUAL]
+Sistema operacional alvo: [Windows]
+--
+**OBJETIVO_PRINCIPAL:**
+Desenvolver um programa em Python que utilize o microfone do sistema
+para reconhecer voz em português brasileiro (pt-BR),
+converter fala em texto e interpretar comandos básicos,
+respondendo corretamente no console.
+--
+**REQUISITOS_TECNICOS**
+###Linguagem
+- Python: [VERSAO_PYTHON]
+###Sistema Operacional
+- Windows: [VERSAO_WINDOWS]
+###Biblioteca Principal
+- SpeechRecognition
+###Entrada de Áudio
+- Microfone padrão do sistema
+###Qualidade do Código
+- Código comentado
+- Estrutura organizada
+- Funções bem definidas
+- Fácil manutenção
+###Tratamento de Erros (OBRIGATÓRIO)
+O sistema DEVE tratar explicitamente:
+- [ERRO_SILENCIO]
+- [ERRO_AUDIO_NAO_RECONHECIDO]
+- [ERRO_FALHA_SERVICO]
+- [ERRO_MICROFONE]
+--
+**FUNCIONALIDADES_OBRIGATORIAS:**
+O sistema DEVE executar as seguintes etapas, na ordem:
+>>> [1] Capturar áudio a partir do microfone
+>>> [2] Converter fala em texto no idioma [pt-BR]
+>>> [3] Exibir o texto reconhecido no console
+>>> [4] Verificar correspondência com comandos definidos
+>>> [5] Executar ação associada ao comando
+>>> [6] Permitir encerramento seguro por comando de voz
+--
+* COMANDOS_DE_VOZ *
+Lista base de comandos suportados:
+[COMANDO_INICIAR] → ação simulada de inicialização  
+[COMANDO_PARAR]   → ação simulada de parada  
+[COMANDO_STATUS]  → exibição de status  
+[COMANDO_SAIR]    → encerramento seguro do programa  
+Observação:
+As ações podem ser implementadas com print() ou funções simples.
+--
+* ESTRUTURA_DO_CODIGO *
+Fornecer código COMPLETO e EXECUTÁVEL contendo:
+### Blocos obrigatórios
+- [IMPORTS]
+- [CONFIGURACOES_INICIAIS]
+- [FUNCOES_DE_RECONHECIMENTO]
+- [INTERPRETACAO_DE_COMANDOS]
+- [LOOP_PRINCIPAL]
+- [ENCERRAMENTO_DO_PROGRAMA]
+Cada bloco DEVE conter comentários explicativos claros.
+--
+* INSTALACAO_E_CONFIGURACAO *
+Explicar detalhadamente:
+>>> Como instalar o Python no Windows (se necessário)
+>>> Como instalar dependências usando [pip]
+>>> Como instalar:
+    - SpeechRecognition
+    - PyAudio
+>>> Incluir solução para erros comuns do PyAudio no Windows:
+    - pipwin
+    - wheels pré-compilados
+    - permissões de microfone
+--
+* EXTRAS_OPCIONAIS *
+Se possível, incluir:
+[EXTRA_1] → Como adaptar o código para controle de robô  
+[EXTRA_2] → Alternativa OFFLINE ao SpeechRecognition  
+[EXTRA_3] → Boas práticas para ambientes reais (ruído, campo, latência)  
+--
+* FORMATO_DA_RESPOSTA *
+Regras obrigatórias para a resposta:
+- Utilizar Markdown
+- Utilizar blocos de código bem formatados
+- Não misturar código com texto explicativo
+- Explicações curtas, diretas e técnicas
+- Não omitir nenhuma etapa essencial
+--
+* SAIDA_ESPERADA *
+<resultado>
+- O usuário fala um comando no microfone
+- O texto reconhecido aparece no console
+- O sistema executa a ação correspondente
+- O programa permanece estável e controlável
+</resultado>
