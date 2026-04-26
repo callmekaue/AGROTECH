@@ -1,0 +1,119 @@
+**PERSONA:** Microcontrolador Arduino responsável por coletar dados do ambiente por meio de sensores (umidade do solo, temperatura, luminosidade e umidade do ar), atuando como a “base física” do robô agrícola, fornecendo informações reais do campo para o sistema.
+--
+**TAREFA:** Ler continuamente os dados dos sensores conectados, como umidade do solo, temperatura e luminosidade, processar essas informações de forma básica e enviá-las para o sistema em Python através da comunicação serial, permitindo que o robô tome decisões como irrigação, alertas e recomendações ao produtor.
+--
+**CONTEXTO:** O Arduino será utilizado diretamente no ambiente rural, instalado na plantação ou próximo a ela, operando em condições reais do campo. Ele será responsável por monitorar constantemente as condições do solo e do clima, mesmo em locais com pouca infraestrutura tecnológica.
+Os dados coletados serão enviados para um sistema em Python que fará a análise e auxiliará o produtor na tomada de decisões. Esse conjunto (Arduino + sensores + sistema) forma uma solução acessível, de baixo custo e eficiente para melhorar a produção agrícola.
+--
+**FORMATO:**
+-Código em linguagem C/C++ (Arduino IDE); 
+-Uso de funções como setup() e loop(); 
+-Leitura de sensores via portas analógicas e digitais; 
+-Envio de dados pela comunicação serial (Serial.begin, Serial.print); 
+-Dados estruturados no formato texto (ex: <LUZ>:valor;<UMIDADE>:valor;<TEMPERATURA>:valor); 
+-Atualização periódica dos dados (ex: a cada 2 segundos); 
+-Código simples, organizado e comentado;
+--
+**RESTRIÇÕES:**
+-Utilizar componentes de baixo custo e fácil acesso;
+-Garantir baixo consumo de energia;
+-Funcionar em ambientes com pouca infraestrutura (sem internet constante);
+-Evitar processamento complexo no Arduino (deixar a análise para o Python);
+-Garantir estabilidade na leitura dos sensores;
+-Tratar falhas simples (sensor desconectado ou leitura inválida);
+-Manter comunicação serial simples e padronizada;
+-Priorizar simplicidade e confiabilidade do sistema;
+--
+Ambiente de uso:
+- Monitoramento agrícola
+- Automação e apoio à decisão
+- Ambiente real (campo)
+Plataformas envolvidas:
+- Computador / Robô: [Python 3]
+- Microcontrolador: [Arduino]
+- Comunicação: [Serial via USB]
+--
+**OBJETIVO:**
+Criar um sistema em Python capaz de se comunicar com um Arduino
+para ler e interpretar dados de sensores ambientais, exibindo
+informações e tomando decisões simples com base nos valores coletados.
+Sensores utilizados:
+- [SENSOR_LUZ]
+- [SENSOR_UMIDADE]
+- [SENSOR_TEMPERATURA]
+--
+**DADOS_DE_ENTRADA:**
+###Sensores Conectados ao Arduino
+- Luz: [TIPO_SENSOR_LUZ]
+- Umidade: [TIPO_SENSOR_UMIDADE]
+- Temperatura: [TIPO_SENSOR_TEMPERATURA]
+### Formato dos Dados Enviados pelo Arduino
+Os dados DEVEM ser enviados em texto estruturado, por exemplo:
+<LUZ>:valor;<UMIDADE>:valor;<TEMPERATURA>:valor
+--
+**TAREFA:**
+***Desenvolver o código Python responsável por:***
+>>> Inicializar a comunicação serial com o Arduino
+>>> Solicitar ou aguardar dados dos sensores
+>>> Ler mensagens enviadas pela porta serial
+>>> Interpretar os valores recebidos
+>>> Exibir os dados formatados no console
+>>> Executar decisões simples baseadas nos valores
+>>> Manter o sistema em execução contínua
+>>> Encerrar o sistema de forma segura
+--
+**LOGICA_DE_DECISAO:**
+- Se [UMIDADE] < LIMITE_BAIXO → exibir alerta "Solo seco"
+- Se [TEMPERATURA] > LIMITE_ALTO → exibir alerta "Temperatura elevada"
+- Se [LUZ] < LIMITE_MINIMO → exibir alerta "Baixa luminosidade"
+As ações podem ser simuladas inicialmente com print().
+--
+**REQUISITOS_TECNICOS**
+### Linguagem
+- Python 3
+###Biblioteca de Comunicação
+- pyserial
+###Qualidade do Código
+- Código organizado
+- Funções bem definidas
+- Comentários explicativos
+- Fácil manutenção e expansão
+### Tratamento de Erros (OBRIGATÓRIO)
+- Falha na comunicação serial
+- Arduino desconectado
+- Dados incompletos ou inválidos
+- Timeout de leitura
+--
+**ESTRUTURA_DO_CODIGO:**
+O código Python DEVE conter obrigatoriamente:
+[IMPORTS]
+[CONFIGURACAO_DA_PORTA_SERIAL]
+[FUNCAO_DE_LEITURA_SERIAL]
+[FUNCAO_DE_INTERPRETACAO_DOS_DADOS]
+[FUNCAO_DE_DECISAO]
+[LOOP_PRINCIPAL]
+[ENCERRAMENTO_SEGURO]
+Cada bloco deve estar claramente comentado.
+--
+**INTEGRACAO_COM_ARDUINO**
+Descrever brevemente:
+- Configuração da Serial no Arduino
+- Uso de Serial.begin()
+- Uso de Serial.print() para envio dos dados
+- Frequência de envio das leituras
+--
+**FORMATO_DA_RESPOSTA**
+- Utilizar Markdown
+- Código em blocos bem formatados
+- Explicações técnicas, curtas e objetivas
+- Não misturar código com texto
+- Não omitir etapas essenciais
+--
+**SAIDA_ESPERADA**
+<resposta>
+- O sistema conecta corretamente ao Arduino
+- Os sensores são lidos com sucesso
+- Os dados ambientais são exibidos no console
+- As regras de decisão são aplicadas
+- O sistema permanece estável em execução contínua
+</resposta>
