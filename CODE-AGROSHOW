@@ -1,0 +1,360 @@
+import speech_recognition as sr
+import pyttsx3
+import serial
+import time
+
+# ================= CONFIG =================
+DEBUG = True
+PORTA = 'COM4'  # 🔥 ajuste conforme seu Arduino
+
+# ================= LOG =================
+def log(msg):
+    if DEBUG:
+        print(msg)
+
+# ================= CONEXÃO ARDUINO =================
+try:
+    arduino = serial.Serial(PORTA , 9600, timeout=1)
+    time.sleep(2)
+    log(f"[DEBUG] Arduino conectado na porta {PORTA}")
+except:
+    arduino = None
+    log("[ERRO] Arduino NÃO conectado")
+
+# ================= VOZ =================
+def falar(texto):
+    print("Assistente:", texto)
+
+    try:
+        engine = pyttsx3.init()
+        engine.setProperty('rate', 170)
+        engine.setProperty('volume', 1.0)
+
+        voices = engine.getProperty('voices')
+        if voices:
+            engine.setProperty('voice', voices[0].id)
+
+        engine.say(texto)
+        engine.runAndWait()
+        engine.stop()
+        del engine
+    except:
+        print("(Erro no áudio, mas continuo funcionando)")
+
+# ================= NORMALIZAÇÃO =================
+def normalizar_comando(comando):
+
+    substituicoes = {
+        "temperatura": ["temperatura", "graus", "calor"],
+        "umidade": ["umidade", "um idade", "umid"],
+        "distancia": ["distancia", "distância", "obstaculo", "obstáculo"],
+        "status": ["status", "situação", "situacao"],
+        "irrigar": ["irrigar", "regar", "molhar"],
+        "solo": ["solo", "terra"],
+        "sair": ["sair", "desligar", "parar"]
+    }
+
+    for chave, palavras in substituicoes.items():
+        for palavra in palavras:
+            if palavra in comando:
+                return chave
+
+    return comando
+
+# ================= LEITURA DO ARDUINO =================
+def obter_dados():
+
+    if arduino:
+        try:
+            for _ in range(5):  # 🔥 tenta até 5 leituras válidas
+
+                linha = arduino.readline().decode(errors='ignore').strip()
+
+                if not linha:
+                    continue
+
+                log(f"[DEBUG] Linha recebida: {linha}")
+
+                # 🔥 ignora qualquer coisa que não seja dado real
+                if "SOLO:" not in linha:
+                    continue
+
+                partes = linha.split("|")
+
+                dados = {}
+
+                for parte in partes:
+                    if ":" not in parte:
+                        continue
+
+                    chave, valor = parte.split(":")
+
+                    if chave == "SOLO":
+                        dados["umidade"] = int(valor)
+
+                    elif chave == "TEMP":
+                        dados["temperatura"] = float(valor)
+
+                    elif chave == "DIST":
+                        dados["distancia"] = float(valor)
+
+                    elif chave == "AR_TEMP":
+                        dados["temp_ar"] = float(valor)
+
+                    elif chave == "AR_UMID":
+                        dados["umid_ar"] = float(valor)
+
+                    elif chave == "LUZ":
+                        dados["luz"] = int(valor)
+
+                # 🔥 valida se veio pelo menos o essencial
+                if "temperatura" in dados and "umidade" in dados and "distancia" in dados:
+                    log(f"[DEBUG] Dados válidos: {dados}")
+                    return dados
+
+            log("[ERRO] Nenhuma leitura válida recebida")
+            return None
+
+        except Exception as e:
+            log(f"[ERRO] Falha ao ler Arduino: {e}")
+            return None
+
+    else:
+        log("[DEBUG] Modo simulado ativado")
+        return {
+            "temperatura": 25,
+            "umidade": 50,
+            "distancia": 20,
+            "temp_ar": 25,
+            "umid_ar": 60,
+            "luz": 500
+        }
+    
+
+# ================= FORMATAÇÃO PARA LCD =================
+def formatar_lcd(resposta, dados):
+
+    try:
+        # 🌡️ Temperatura solo
+        if "temperatura" in resposta.lower():
+            return f"Temp:{dados['temperatura']:.1f}C"
+
+        # 💧 Umidade solo
+        elif "umidade" in resposta.lower():
+            return f"Solo:{dados['umidade']}%"
+
+        # ☀️ Luz
+        elif "luz" in resposta.lower():
+            luz = dados.get("luz", 0)
+
+            if luz < 200:
+                status = "Baixa"
+            elif luz < 600:
+                status = "Media"
+            else:
+                status = "Alta"
+
+            return f"Luz:{status}"
+
+        # 🚧 Distância
+        elif "distancia" in resposta.lower() or "obstaculo" in resposta.lower():
+            return f"Dist:{int(dados['distancia'])}cm"
+
+        # 📊 Status geral (resumo compacto)
+        elif "status" in resposta.lower():
+            return f"S:{dados['umidade']}% T:{int(dados['temperatura'])}"
+
+        # 🌱 Solo direto
+        elif "solo" in resposta.lower():
+            return f"Solo:{dados['umidade']}%"
+
+        # fallback (corta pra caber no LCD)
+        else:
+            return resposta[:16]
+
+    except:
+        return "Erro LCD"
+
+
+# ================= INTELIGÊNCIA =================
+def analisar_plantio(cultura, dados):
+    if dados["umidade"] < 40:
+        return f"O solo está seco, não é ideal para plantar {cultura}"
+    elif dados["temperatura"] < 20:
+        return f"A temperatura está baixa para o plantio de {cultura}"
+    elif dados["temperatura"] > 40:
+        return f"A temperatura está muito alta para o plantio de {cultura}"
+    else:
+        return f"As condições estão boas para plantar {cultura}"
+
+# ================= PROCESSAMENTO =================
+def processar_comando(comando):
+    comando = comando.lower()
+    dados = obter_dados()
+
+    if not dados or dados.get("temperatura", -1) == -1:
+        return "Não consegui obter dados do sensor agora"
+
+    temperatura = dados["temperatura"]
+    umidade = dados["umidade"]
+    distancia = dados["distancia"]
+    umidade_ar = dados.get("umid_ar", 0)
+
+    # 🌡️ TEMPERATURA DO AR (NOVA)
+    if "temperatura do ar" in comando or "temp ar" in comando:  # 🔥 ALTERAÇÃO
+        return f"A temperatura do ar está em {temperatura:.1f} graus"
+
+    # 💧 UMIDADE DO AR (NOVA)
+    elif "umidade do ar" in comando or "umidade ar" in comando:  # 🔥 ALTERAÇÃO
+        return f"A umidade do ar está em {umidade_ar:.0f} por cento"
+
+    elif "temperatura" in comando:
+        return f"A temperatura está em {temperatura:.1f} graus"
+
+    elif "umidade" in comando:
+        return f"A umidade do solo está em {umidade} por cento"
+
+    elif "distancia" in comando or "obstaculo" in comando:
+        if distancia < 15:
+            return f"Há um obstáculo muito próximo a {int(distancia)} centímetros"
+        elif distancia < 30:
+            return f"Existe algo à frente a {int(distancia)} centímetros"
+        else:
+            return "O caminho está livre"
+
+    elif "solo" in comando:
+        if umidade < 40:
+            return "O solo está seco"
+        elif umidade <= 70:
+            return "O solo está em condição ideal"
+        else:
+            return "O solo está muito úmido"
+
+    # 🚿 IRRIGAÇÃO
+    elif "irrigar" in comando:
+        if umidade < 40:
+            return "Sim, eh recomendado irrigar agora"
+        else:
+            return "Nao eh necessario irrigar no momento"
+
+    # 🌾 PLANTIO INTELIGENTE
+    elif "plantar" in comando:
+
+        if "milho" in comando:
+            return analisar_plantio("milho", dados)
+
+        elif "feijão" in comando or "feijao" in comando:
+            return analisar_plantio("feijão", dados)
+
+        elif "soja" in comando:
+            return analisar_plantio("soja", dados)
+
+        elif "trigo" in comando:
+            return analisar_plantio("trigo", dados)
+
+        else:
+            return "Qual cultura você deseja plantar? Milho, feijão, soja ou trigo?"
+
+    # 📊 STATUS GERAL
+    elif "status" in comando:
+        status_solo = "seco" if umidade < 40 else "ideal" if umidade <= 70 else "úmido"
+
+        return (
+            f"Status atual: temperatura {temperatura:.1f} graus, "
+            f"umidade {umidade} por cento, solo {status_solo}, "
+            f"distância {int(distancia)} centímetros"
+        )
+
+    # ❌ SAIR
+    elif "sair" in comando:
+        return "Encerrando assistente"
+
+    else:
+        return "Não entendi o comando"
+
+# ================= RECONHECIMENTO =================
+recognizer = sr.Recognizer()
+
+def ouvir():
+    try:
+        with sr.Microphone() as source:
+            print("🎤 Ajustando ruído ambiente...")
+            recognizer.adjust_for_ambient_noise(source, duration=2)
+
+            print("🎤 Fale agora...")
+            audio = recognizer.listen(
+                source,
+                timeout=8,
+                phrase_time_limit=6
+            )
+
+            comando = recognizer.recognize_google(
+                audio,
+                language='pt-BR'
+            )
+
+            comando = comando.lower().strip()
+
+            print("Você disse:", comando)
+
+            return normalizar_comando(comando)
+
+    except sr.WaitTimeoutError:
+        print("[ERRO] Tempo esgotado")
+        return None
+
+    except sr.UnknownValueError:
+        print("[ERRO] Não entendi")
+        return None
+
+    except sr.RequestError:
+        print("[ERRO] Falha no serviço")
+        return input("Digite o comando: ")
+
+    except:
+        return input("Digite o comando: ")
+
+# ================= INÍCIO =================
+falar("Assistente agrícola iniciado. Pode falar.")
+
+# ================= LOOP PRINCIPAL =================
+while True:
+
+    comando = None
+
+    # 🔁 TENTATIVA DUPLA
+    for _ in range(2):
+        comando = ouvir()
+        if comando:
+            break
+        else:
+            falar("Não entendi, pode repetir?")
+
+    if comando:
+        dados = obter_dados()  # 🔥 IMPORTANTE
+
+        resposta = processar_comando(comando)
+        falar(resposta)
+
+        # ================= ENVIO PARA ARDUINO =================
+        print("[DEBUG] Tentando enviar pro LCD...")
+
+        if arduino and dados:
+
+            msg_lcd = formatar_lcd(resposta, dados)
+            msg = "MSG:" + msg_lcd + "\n"
+
+            print("[ENVIO SERIAL]", msg)  # 🔥 precisa aparecer
+
+            arduino.write(msg.encode())
+            arduino.flush()
+
+        else:
+            print("[ERRO] Arduino não conectado ou dados inválidos")
+        # =====================================================
+
+        if "encerrando" in resposta.lower():
+            break
+
+    else:
+        falar("Não consegui entender")
